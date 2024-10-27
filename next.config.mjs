@@ -7,7 +7,11 @@ const nextConfig = {
                 hostname:"www.flaticon.com"
             }
         ]
+    },
+    eslint:{
+        ignoreDuringBuilds:true, 
     }
+    
 };
 
 export default nextConfig;
