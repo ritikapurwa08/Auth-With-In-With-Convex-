@@ -1,6 +1,3 @@
 {
-    "editor.fontSize": 16,
-    "editor.fontLigatures": true,
-    "editor.fontVariations": true,
-    "editor.fontWeight": "200"
+    "editor.fontSize": 15
 }
