@@ -10,6 +10,19 @@ const schema = defineSchema({
     price: v.number(),
   }),
 
+  snippets: defineTable({
+    userId: v.id("users"),
+    projectName: v.string(),
+    projectImage: v.optional(v.string()),
+    projectFiles: v.array(
+      v.object({
+        fileName: v.string(),
+        fileType: v.string(),
+        fileCode: v.string(),
+      })
+    ),
+  }),
+
   //
   //  workspace schema
   //
