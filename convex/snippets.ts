@@ -110,15 +110,11 @@ export const remove = mutation({
 
       // Delete the snippet from the database
       await ctx.db.delete(args.id);
-
-      return {
-        success: true,
-        id: args.id,
-        message: "Project and associated image deleted successfully",
-      };
     } catch (error) {
       throw new ConvexError(`Failed to delete project:`);
     }
+
+    return args.id;
   },
 });
 

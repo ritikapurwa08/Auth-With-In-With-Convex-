@@ -4,15 +4,6 @@ import { useMutation } from "convex/react";
 import { api } from "../../convex/_generated/api";
 import { z } from "zod";
 
-export const fileTypes = [
-  { label: "JavaScript", value: "javascript" },
-  { label: "React", value: "react" },
-  { label: "Next.js", value: "next_js" },
-  { label: "TypeScript", value: "typescript" },
-  { label: "HTML", value: "html" },
-  { label: "CSS", value: "css" },
-];
-
 export const fileSchema = z.object({
   fileName: z.string().min(1, "File name is required"),
   fileType: z.string().min(1, "File type is required"),
@@ -30,13 +21,7 @@ export const projectSchemaZod = z.object({
 export type ProjectTypeZod = z.infer<typeof projectSchemaZod>;
 
 type RequestType = {
-  projectName: string;
-  projectImage: string | undefined;
-  projectFiles: {
-    fileName: string;
-    fileType: string;
-    fileCode: string;
-  }[];
+  id: Id<"snippets">;
 };
 
 type ResponseType = Id<"snippets"> | null;
@@ -48,7 +33,7 @@ type Options = {
   throwError?: boolean;
 };
 
-export const useCreateSnippets = () => {
+export const useRemoveSnippets = () => {
   const [data, setData] = useState<ResponseType>(null);
   const [error, setError] = useState<Error | null>(null);
   const [status, setStatus] = useState<
@@ -60,7 +45,7 @@ export const useCreateSnippets = () => {
   const isSuccess = useMemo(() => status === "success", [status]);
   const isSettled = useMemo(() => status === "settled", [status]);
 
-  const mutation = useMutation(api.snippets.create);
+  const mutation = useMutation(api.snippets.remove);
 
   const mutate = useCallback(
     async (values: RequestType, options: Options) => {

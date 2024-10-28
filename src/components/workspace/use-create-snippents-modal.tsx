@@ -20,6 +20,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Card, CardContent } from "@/components/ui/card";
 
 import {
+  fileTypes,
   projectSchemaZod,
   ProjectTypeZod,
   useCreateSnippets,
@@ -83,15 +84,6 @@ const CreateSnippetsModal = () => {
       }
     );
   };
-
-  const options = [
-    { label: "JavaScript", value: "javascript" },
-    { label: "React", value: "react" },
-    { label: "Next.js", value: "next_js" },
-    { label: "TypeScript", value: "typescript" },
-    { label: "HTML", value: "html" },
-    { label: "CSS", value: "css" },
-  ];
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -159,7 +151,7 @@ const CreateSnippetsModal = () => {
                         control={form.control}
                         name={`projectFiles.${index}.fileType`}
                         label="File Type"
-                        options={options}
+                        options={fileTypes}
                         placeholder="Select file type"
                       />
                     </div>
