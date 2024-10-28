@@ -37,8 +37,10 @@ const UserButton = () => {
   const handleSignOut = useCallback(async () => {
     setIsPending(true);
     try {
-      await signOut();
-      router.replace("/auth");
+      await signOut().then(() => {
+        router.push("/auth");
+      });
+      router.push("/auth");
     } catch (error) {
       console.error("Sign out failed:", error);
     } finally {
