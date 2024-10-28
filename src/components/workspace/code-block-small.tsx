@@ -69,7 +69,7 @@ const CodeBlockSmall: React.FC<CodeBlockSmallProps> = ({
           {projectName}
         </h3>
         {isOwner && (
-          <div className="flex flex-row justify-center items-center gap-x-2">
+          <div className="flex flex-row justify-center items-center w-full gap-x-2">
             <UpdateSnippetModal id={id} />
             <RemoveSnippets id={id} />
           </div>

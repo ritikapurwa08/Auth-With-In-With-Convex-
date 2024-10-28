@@ -51,12 +51,7 @@ const RemoveSnippets = ({ id }: RemoveSnippetsProps) => {
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
       <AlertDialogTrigger asChild>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-8 w-8 text-muted-foreground hover:text-foreground"
-          aria-label="Remove snippet"
-        >
+        <Button>
           <Trash2 className="h-4 w-4" />
           <span>Remove </span>
         </Button>
