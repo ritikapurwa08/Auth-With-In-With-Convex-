@@ -1,13 +1,11 @@
-import UserButton from "@/components/auth/user-button";
+import ComponentShowDown from "@/components/style/components-showdown";
+import HeroPage from "@/components/style/hero-page";
 
 export default function Page() {
   return (
     <section>
-      <div>
-        <h2 className="">hello current user</h2>
-
-        <UserButton />
-      </div>
+      <HeroPage />
+      <ComponentShowDown />
     </section>
   );
 }

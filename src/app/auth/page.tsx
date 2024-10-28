@@ -14,7 +14,7 @@ const Page = () => {
   };
   return (
     <section className="flex items-center h-full w-full justify-center max-w-md mx-auto">
-      <Card className="p-4 w-full">
+      <Card className="p-4 mx-4 w-full">
         <CardHeader>
           <CardTitle>
             {RegisterType === "signUp"

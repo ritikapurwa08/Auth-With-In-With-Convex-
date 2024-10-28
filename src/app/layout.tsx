@@ -7,6 +7,7 @@ import JotaiProvider from "@/components/providers/jotai-provider";
 import { Inter, Roboto, Open_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
+import Navbar from "@/components/workspace/navbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -29,13 +30,16 @@ export default function RootLayout({
           <html lang="en">
             <body
               className={cn(
-                "antialiased h-screen container min-w-full",
+                "antialiased h-screen   w-full container ",
                 inter.className,
                 roboto.className,
-                openSans.className,
+                openSans.className
               )}
             >
-              {children}
+              <div>
+                <Navbar />
+              </div>
+              <div className="max-w-7xl w-full mx-auto">{children}</div>
               <Toaster />
             </body>
           </html>

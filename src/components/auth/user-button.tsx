@@ -79,41 +79,49 @@ const UserButton = () => {
           )}
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56" align="end" side="left" forceMount>
-        <DropdownMenuItem className="">
-          <div className="flex flex-col items-start p-1">
-            <span className="text-sm font-semibold">{currentUser?.name}</span>
-            <span className="text-xs text-muted-foreground font-medium">
-              {currentUser?.email}
-            </span>
-          </div>
-        </DropdownMenuItem>
 
-        <DropdownMenuItem
-          className="cursor-pointer flex items-center p-2 text-sm"
-          onSelect={(event) => {
-            event.preventDefault();
-            if (!userLoading) {
-              handleSignOut().catch((error) =>
-                console.error("Sign out handler failed:", error)
-              );
-            }
-          }}
-          disabled={userLoading}
-        >
-          {isPending ? (
-            <Loader className="mr-2 h-4 w-4 animate-spin" />
-          ) : (
-            <LogOut className="mr-2 h-4 w-4" />
-          )}
-          <span>
-            {userLoading
-              ? "Loading..."
-              : isPending
-                ? "Signing out..."
-                : "Sign out"}
-          </span>
-        </DropdownMenuItem>
+      <DropdownMenuContent
+        className="w-80"
+        align="end"
+        side="bottom"
+        forceMount
+      >
+        <div className="flex flex-row">
+          <DropdownMenuItem className="">
+            <div className="flex flex-col items-start p-1">
+              <span className="text-sm font-semibold">{currentUser?.name}</span>
+              <span className="text-xs text-muted-foreground font-medium">
+                {currentUser?.email}
+              </span>
+            </div>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem
+            className="cursor-pointer flex items-center p-2 text-sm"
+            onSelect={(event) => {
+              event.preventDefault();
+              if (!userLoading) {
+                handleSignOut().catch((error) =>
+                  console.error("Sign out handler failed:", error)
+                );
+              }
+            }}
+            disabled={userLoading}
+          >
+            {isPending ? (
+              <Loader className="mr-2 h-4 w-4 animate-spin" />
+            ) : (
+              <LogOut className="mr-2 h-4 w-4" />
+            )}
+            <span>
+              {userLoading
+                ? "Loading..."
+                : isPending
+                  ? "Signing out..."
+                  : "Sign out"}
+            </span>
+          </DropdownMenuItem>
+        </div>
       </DropdownMenuContent>
     </DropdownMenu>
   );
