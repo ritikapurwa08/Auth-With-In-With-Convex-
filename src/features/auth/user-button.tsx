@@ -13,13 +13,13 @@ import { Button } from "@/components/ui/button";
 import { Loader, LogOut } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { useCurrentUser } from "@/api/user";
+import { UseCurrentUser } from "@/api/user";
 
 const UserButton = () => {
   const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
   const [isPending, setIsPending] = useState(false);
 
-  const { user: currentUser, isLoading: userLoading } = useCurrentUser();
+  const { user: currentUser, isLoading: userLoading } = UseCurrentUser();
   const { signOut } = useAuthActions();
   const router = useRouter();
 

@@ -193,6 +193,39 @@ export const getPaginatedSnippets = query({
     // Query snippets with pagination
     const results = await ctx.db
       .query("snippets")
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    // Process and return results
+    return {
+      ...results,
+      page: await Promise.all(
+        results.page.map(async (snippet) => {
+          // Add any additional processing here if needed
+          return {
+            ...snippet,
+            formattedDate: new Date(snippet._creationTime).toLocaleDateString(),
+          };
+        })
+      ),
+    };
+  },
+});
+
+export const getOwnPaginatedSnippets = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    // Get authenticated user
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Authentication required");
+    }
+
+    // Query snippets with pagination
+    const results = await ctx.db
+      .query("snippets")
       .withIndex("by_user", (q) => q.eq("userId", userId))
       .order("desc")
       .paginate(args.paginationOpts);

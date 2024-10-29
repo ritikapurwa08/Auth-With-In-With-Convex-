@@ -2,12 +2,13 @@ import { Id } from "../../../../convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import UpdateSnippetForm from "../form/update-snippets-form";
 import RemoveSnippetDialog from "../form/remove-snippet-dialog";
-import { useCurrentUser } from "@/api/user";
+
 import { useState } from "react";
 import FileSelector from "@/features/global/file-selector";
 import CopyCode from "@/features/global/copy-code";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
+import { UseCurrentUser } from "@/api/user";
 interface SnippetFile {
   fileName: string;
   fileType: string;
@@ -30,7 +31,7 @@ const SnippetCard = ({
   const [selectedFile, setSelectedFile] = useState<SnippetFile | null>(
     projectFiles.length > 0 ? projectFiles[0] : null
   );
-  const { user: currentUser } = useCurrentUser();
+  const { user: currentUser } = UseCurrentUser();
 
   const isOwner = currentUser?._id === userId;
   const handleFileSelect = (file: SnippetFile) => {
