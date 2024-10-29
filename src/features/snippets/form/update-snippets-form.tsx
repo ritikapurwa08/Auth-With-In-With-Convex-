@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
-import { Id } from "../../../convex/_generated/dataModel";
-import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { projectSchemaZod, ProjectTypeZod } from "@/api/use-create-snippets";
+import React, { useEffect, useState } from "react";
+import { Id } from "../../../../convex/_generated/dataModel";
 import { useToast } from "@/hooks/use-toast";
+import { useFieldArray, useForm } from "react-hook-form";
+import { projectSchemaZod, ProjectTypeZod } from "@/api/use-create-snippets";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { useGetSnippet } from "@/api/use-get-snippet";
 import { snippetFileTypes, useUpdateSnippets } from "@/api/use-update-snippet";
 import {
@@ -14,29 +14,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
-import { PlusCircle, Loader2, X, Plus, Edit2Icon } from "lucide-react";
-import { Form } from "../ui/form";
-import { Alert, AlertDescription } from "../ui/alert";
-import CustomInput from "../providers/custom-input";
+import { Loader2, X, Plus, Edit2Icon } from "lucide-react";
+import { Hint } from "@/components/ui/hint";
+import { Button } from "@/components/ui/button";
+import { Form } from "@/components/ui/form";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import CustomInput from "@/features/global/form-provider/custom-input";
 import { Card, CardContent } from "@/components/ui/card";
-import CustomSelect from "../providers/custom-select";
-import CustomTextarea from "../providers/custom-textarea";
-import { useCurrentUser } from "@/api/user";
-import { Hint } from "../ui/hint";
+import CustomSelect from "@/features/global/form-provider/custom-select";
+import CustomTextarea from "@/features/global/form-provider/custom-textarea";
 
-interface UpdateSnippetsProps {
+interface UpdateSnippetsFormProps {
   id: Id<"snippets">;
 }
 
-const UpdateSnippetModal = ({ id }: UpdateSnippetsProps) => {
+const UpdateSnippetForm = ({ id }: UpdateSnippetsFormProps) => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
   const { toast } = useToast();
-  const { user: currentUser, isLoading: currentUserLoading } = useCurrentUser();
-  const { data: snippetData, isLoading } = useGetSnippet({ id });
-  const { mutate, isPending } = useUpdateSnippets();
 
   const form = useForm<ProjectTypeZod>({
     resolver: zodResolver(projectSchemaZod),
@@ -52,62 +48,67 @@ const UpdateSnippetModal = ({ id }: UpdateSnippetsProps) => {
     },
   });
 
-  // Update form when snippet data is loaded
+  const { data: currentSnippet } = useGetSnippet({ id });
+
+  const { mutate: updateSnippet, isPending: updatingSnippets } =
+    useUpdateSnippets();
+
   useEffect(() => {
-    if (snippetData) {
+    if (currentSnippet) {
       form.reset({
-        projectName: snippetData.projectName,
-        projectFiles: snippetData.projectFiles.map((file) => ({
+        projectName: currentSnippet.projectName,
+        projectFiles: currentSnippet.projectFiles.map((file) => ({
           fileName: file.fileName,
           fileType: file.fileType,
           fileCode: file.fileCode,
         })),
       });
     }
-  }, [snippetData, form]);
+  }, [currentSnippet, form]);
 
   const handleSubmit = async (values: ProjectTypeZod) => {
     setError("");
 
-    mutate(
+    updateSnippet(
       {
         id,
         projectName: values.projectName,
-        projectImage: snippetData?.projectImage || "",
         projectFiles: values.projectFiles,
+        projectImage: "",
       },
       {
-        onSuccess() {
+        onSuccess(data) {
           toast({
             title: "Success!",
-            description: "Project updated successfully",
-            variant: "default",
+            description: `Project updated successfully here is id ${data}`,
           });
-          setOpen(false);
-        },
-        onError() {
-          setError("Failed to update project");
-        },
-        onSettled() {
           form.reset();
           setOpen(false);
         },
+        onError(error) {
+          setError(`failed to update project ${error}`);
+        },
+        onSettled() {},
       }
     );
+  };
+
+  const handleCancel = () => {
+    if (
+      !form.formState.isDirty ||
+      window.confirm(
+        "Are  you sure you want to cancel? All unsaved changes will be lost"
+      )
+    ) {
+      setOpen(false);
+      form.reset();
+    }
   };
 
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "projectFiles",
   });
-
-  if (isLoading) {
-    return (
-      <div className="flex items-center justify-center p-4">
-        <Loader2 className="h-6 w-6 animate-spin" />
-      </div>
-    );
-  }
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -212,29 +213,17 @@ const UpdateSnippetModal = ({ id }: UpdateSnippetsProps) => {
             </div>
 
             <DialogFooter className="gap-2">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => {
-                  if (
-                    !form.formState.isDirty ||
-                    window.confirm(
-                      "Are you sure you want to close? Any unsaved changes will be lost."
-                    )
-                  ) {
-                    setOpen(false);
-                    form.reset();
-                  }
-                }}
-              >
+              <Button type="button" variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
               <Button
                 type="submit"
-                disabled={isPending || currentUserLoading}
+                disabled={updatingSnippets}
                 className="gap-2"
               >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {updatingSnippets && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
                 Update Project
               </Button>
             </DialogFooter>
@@ -245,4 +234,4 @@ const UpdateSnippetModal = ({ id }: UpdateSnippetsProps) => {
   );
 };
 
-export default UpdateSnippetModal;
+export default UpdateSnippetForm;

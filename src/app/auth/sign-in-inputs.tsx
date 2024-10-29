@@ -6,11 +6,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useAuthActions } from "@convex-dev/auth/react";
 import { useToast } from "@/hooks/use-toast";
 import { Form } from "@/components/ui/form";
-import CustomInput from "@/components/providers/custom-input";
+import CustomInput from "@/features/global/form-provider/custom-input";
 import { LockIcon, MailIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import CustomLoader from "@/components/providers/custom-loader";
-import CustomPasswordInput from "@/components/providers/custom-password-input";
+import CustomLoader from "@/features/global/ui/custom-loader";
+import CustomPasswordInput from "@/features/global/form-provider/custom-password-input";
 
 export default function SignInInputs() {
   const [pending, setPending] = useState(false);

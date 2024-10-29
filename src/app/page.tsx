@@ -1,6 +1,7 @@
-import ComponentShowDown from "@/components/style/components-showdown";
-import HeroPage from "@/components/style/hero-page";
-import MoreSkills from "@/components/style/more-skills";
+import ComponentShowDown from "@/features/hero/components-showdown";
+import HeroPage from "@/features/hero/hero-page";
+
+import MoreSkills from "@/features/hero/more-skills";
 
 export default function Page() {
   return (

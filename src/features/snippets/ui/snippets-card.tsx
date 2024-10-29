@@ -1,56 +1,58 @@
-import React, { useState } from "react";
-import { Id } from "../../../convex/_generated/dataModel";
-import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
-import UpdateSnippetModal from "./use-update-snippets-modal";
-import RemoveSnippets from "./use-remove-snippet";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Id } from "../../../../convex/_generated/dataModel";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import UpdateSnippetForm from "../form/update-snippets-form";
+import RemoveSnippetDialog from "../form/remove-snippet-dialog";
 import { useCurrentUser } from "@/api/user";
+import { useState } from "react";
+import FileSelector from "@/features/global/file-selector";
+import CopyCode from "@/features/global/copy-code";
 import SyntaxHighlighter from "react-syntax-highlighter";
 import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { SelectDemo } from "./file-selector";
-import CopyCode from "./file-copy-code";
-
-interface ProjectFile {
+interface SnippetFile {
   fileName: string;
   fileType: string;
   fileCode: string;
 }
-interface ProjectShowCaseProps {
+interface SnippetCardProps {
+  loading: boolean;
   id: Id<"snippets">;
   userId: Id<"users">;
   projectName: string;
   projectImage?: string;
-  projectFiles: ProjectFile[];
+  projectFiles: SnippetFile[];
 }
 
-const ProjectShowCaseSmall = ({
+const SnippetCard = ({
   id,
   projectFiles,
   projectName,
   userId,
-  projectImage,
-}: ProjectShowCaseProps) => {
-  const [selectedFile, setSelectedFile] = useState<ProjectFile | null>(
+  loading,
+}: SnippetCardProps) => {
+  const [selectedFile, setSelectedFile] = useState<SnippetFile | null>(
     projectFiles.length > 0 ? projectFiles[0] : null
   );
-  const { isLoading: userLoading, user: currentUser } = useCurrentUser();
-
-  const handleFileSelect = (file: ProjectFile) => {
-    setSelectedFile(file);
-  };
+  const { user: currentUser } = useCurrentUser();
 
   const isOwner = currentUser?._id === userId;
+  const handleFileSelect = (file: SnippetFile) => {
+    setSelectedFile(file);
+  };
 
   return (
     <Card>
       <CardHeader>
         <div className="flex flex-row justify-between items-center">
           <div id="project-name">
-            <CardTitle className="text-sm truncate ">{projectName}</CardTitle>
+            <CardTitle className="text-sm lg:max-w-48 truncate max-w-40 ">
+              {loading ? <Skeleton className="size-full" /> : projectName}
+            </CardTitle>
           </div>
           <div id="project-options" className="flex flex-row gap-x-1">
-            {isOwner && <UpdateSnippetModal id={id} />}
-            {isOwner && <RemoveSnippets id={id} />}
-            <SelectDemo
+            {isOwner && <UpdateSnippetForm id={id} />}
+            {isOwner && <RemoveSnippetDialog id={id} />}
+            <FileSelector
               projectFiles={projectFiles}
               onSelectFile={handleFileSelect}
             />
@@ -88,4 +90,4 @@ const ProjectShowCaseSmall = ({
   );
 };
 
-export default ProjectShowCaseSmall;
+export default SnippetCard;

@@ -2,12 +2,12 @@ import React from "react";
 import type { Metadata } from "next";
 import "./globals.css";
 import { ConvexAuthNextjsServerProvider } from "@convex-dev/auth/nextjs/server";
-import { ConvexClientProvider } from "@/components/providers/convex-client-provider";
-import JotaiProvider from "@/components/providers/jotai-provider";
+import { ConvexClientProvider } from "@/features/global/convex-client-provider";
+import JotaiProvider from "@/features/global/form-provider/jotai-provider";
 import { Inter, Roboto, Open_Sans } from "next/font/google";
 import { cn } from "@/lib/utils";
 import { Toaster } from "@/components/ui/toaster";
-import Navbar from "@/components/workspace/navbar";
+import Navbar from "@/features/layout/navbar";
 
 export const metadata: Metadata = {
   title: "Create Next App",

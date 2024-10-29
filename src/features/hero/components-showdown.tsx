@@ -6,8 +6,8 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import { Button } from "../ui/button";
+} from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
 import Image from "next/image";
 import {
   EditIcon,
@@ -20,15 +20,9 @@ import {
   UploadCloudIcon,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  AlertDialog,
-  AlertDialogContent,
-  AlertDialogTitle,
-} from "@radix-ui/react-alert-dialog";
-import { AlertDialogFooter, AlertDialogHeader } from "../ui/alert-dialog";
-import { Input } from "../ui/input";
-import { Textarea } from "../ui/textarea";
-import { Label } from "../ui/label";
+import { Input } from "../../components/ui/input";
+import { Textarea } from "../../components/ui/textarea";
+import { Label } from "../../components/ui/label";
 import { InfoCircledIcon } from "@radix-ui/react-icons";
 
 const ComponentShowDown = () => {

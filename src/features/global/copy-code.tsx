@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { CopyToClipboard } from "react-copy-to-clipboard";
 import { useToast } from "@/hooks/use-toast";
-import { Hint } from "../ui/hint";
-import { Button } from "../ui/button";
 import { Check, Copy } from "lucide-react";
+import { Hint } from "@/components/ui/hint";
+import { Button } from "@/components/ui/button";
 
 const CopyCode = ({ code, fileName }: { code: string; fileName: string }) => {
   const [copied, setCopied] = useState(false);

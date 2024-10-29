@@ -1,5 +1,7 @@
-import React from "react";
-import { useState } from "react";
+import React, { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useFieldArray, useForm } from "react-hook-form";
 import {
   Dialog,
   DialogContent,
@@ -8,32 +10,25 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Form } from "@/components/ui/form";
 import { Button } from "@/components/ui/button";
-import { PlusCircle, Loader2, X, Plus } from "lucide-react";
-import { useFieldArray, useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import CustomInput from "../providers/custom-input";
-import CustomSelect from "../providers/custom-select";
-import CustomTextarea from "../providers/custom-textarea";
-import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Loader2, Plus, PlusCircle, X } from "lucide-react";
+import { Form } from "@/components/ui/form";
+import CustomInput from "@/features/global/form-provider/custom-input";
 import { Card, CardContent } from "@/components/ui/card";
-
+import CustomSelect from "@/features/global/form-provider/custom-select";
+import CustomTextarea from "@/features/global/form-provider/custom-textarea";
 import {
   fileTypes,
   projectSchemaZod,
   ProjectTypeZod,
   useCreateSnippets,
 } from "@/api/use-create-snippets";
-import { useCurrentUser } from "@/api/user";
-import { useToast } from "@/hooks/use-toast";
 
-const CreateSnippetsModal = () => {
+const CreateSnippetForm = () => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
   const { toast } = useToast();
-
   const form = useForm<ProjectTypeZod>({
     resolver: zodResolver(projectSchemaZod),
     defaultValues: {
@@ -53,17 +48,17 @@ const CreateSnippetsModal = () => {
     name: "projectFiles",
   });
 
-  const { mutate, isPending } = useCreateSnippets();
-  const { user: currentUser, isLoading: currentUserLoading } = useCurrentUser();
+  const { mutate: createSnippets, isPending: creatingSnippets } =
+    useCreateSnippets();
 
-  const handleSubmit = async (values: ProjectTypeZod) => {
+  const handleSumbit = async (values: ProjectTypeZod) => {
     setError("");
 
-    mutate(
+    createSnippets(
       {
         projectName: values.projectName,
-        projectImage: "",
         projectFiles: values.projectFiles,
+        projectImage: "",
       },
       {
         onSuccess(data) {
@@ -71,14 +66,18 @@ const CreateSnippetsModal = () => {
           setOpen(false);
           toast({
             title: "Success!",
-            description: "Project created successfully",
+            description: `Project created successfully here is id ${data}`,
             variant: "default",
           });
-          form.reset();
-          setOpen(false);
         },
-        onError(error) {
-          setError("failed to create project");
+        onError() {
+          setError(error);
+          toast({
+            title: "!Error",
+            description: `Failed to create project ${error}`,
+            variant: "default",
+          });
+          setOpen(true);
         },
         onSettled() {},
       }
@@ -89,12 +88,11 @@ const CreateSnippetsModal = () => {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="default" className="gap-2">
-          <PlusCircle className="h-4 w-4" />
+          <PlusCircle className="size-5 text-green-600" />
           Create Project
         </Button>
       </DialogTrigger>
-
-      <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent>
         <DialogHeader>
           <DialogTitle className="text-xl font-semibold">
             Create New Project
@@ -103,15 +101,9 @@ const CreateSnippetsModal = () => {
 
         <Form {...form}>
           <form
-            onSubmit={form.handleSubmit(handleSubmit)}
+            onSubmit={form.handleSubmit(handleSumbit)}
             className="space-y-6"
           >
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
-
             <CustomInput
               control={form.control}
               name="projectName"
@@ -119,34 +111,30 @@ const CreateSnippetsModal = () => {
               placeholder="Enter project name"
               className="w-full"
             />
-
             <div className="space-y-4">
               {fields.map((field, index) => (
                 <Card key={field.id}>
                   <CardContent className="pt-6 space-y-4">
                     <div className="flex justify-between items-center">
-                      <h3 className="text-lg font-medium">File {index + 1}</h3>
+                      <h1 className="font-bold text-lg">File {index + 1}</h1>
                       {fields.length > 1 && (
                         <Button
                           type="button"
-                          variant="ghost"
-                          size="sm"
+                          variant="outline"
+                          size="icon"
                           onClick={() => remove(index)}
-                          className="text-destructive"
                         >
-                          <X className="h-4 w-4" />
+                          <X className="size-5 text-red-600" />
                         </Button>
                       )}
                     </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <CustomInput
                         control={form.control}
                         name={`projectFiles.${index}.fileName`}
                         label="File Name"
                         placeholder="Enter file name"
                       />
-
                       <CustomSelect
                         control={form.control}
                         name={`projectFiles.${index}.fileType`}
@@ -155,7 +143,6 @@ const CreateSnippetsModal = () => {
                         placeholder="Select file type"
                       />
                     </div>
-
                     <CustomTextarea
                       control={form.control}
                       name={`projectFiles.${index}.fileCode`}
@@ -166,12 +153,12 @@ const CreateSnippetsModal = () => {
                   </CardContent>
                 </Card>
               ))}
-
               {fields.length < 4 && (
                 <Button
                   type="button"
                   variant="outline"
-                  className="w-full gap-2"
+                  className="w-full bg-green-600/80 gap-2"
+                  size="lg"
                   onClick={() =>
                     append({
                       fileName: "",
@@ -180,13 +167,12 @@ const CreateSnippetsModal = () => {
                     })
                   }
                 >
-                  <Plus className="h-4 w-4" />
+                  <Plus className="size-5 " />
                   Add Another File
                 </Button>
               )}
             </div>
-
-            <DialogFooter className="gap-2">
+            <DialogFooter>
               <Button
                 type="button"
                 variant="outline"
@@ -206,10 +192,12 @@ const CreateSnippetsModal = () => {
               </Button>
               <Button
                 type="submit"
-                disabled={isPending || currentUserLoading}
+                disabled={creatingSnippets}
                 className="gap-2"
               >
-                {isPending && <Loader2 className="h-4 w-4 animate-spin" />}
+                {creatingSnippets && (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                )}
                 Create Project
               </Button>
             </DialogFooter>
@@ -220,4 +208,4 @@ const CreateSnippetsModal = () => {
   );
 };
 
-export default CreateSnippetsModal;
+export default CreateSnippetForm;

@@ -10,9 +10,9 @@ import { LockIcon, MailIcon, TriangleAlertIcon } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { AuthSignUpSchema, AuthSignUpSchemaType } from "@/app/auth/auth.types";
-import CustomInput from "@/components/providers/custom-input";
-import CustomLoader from "@/components/providers/custom-loader";
-import CustomPasswordInput from "@/components/providers/custom-password-input";
+import CustomInput from "@/features/global/form-provider/custom-input";
+import CustomLoader from "@/features/global/ui/custom-loader";
+import CustomPasswordInput from "@/features/global/form-provider/custom-password-input";
 
 const SignUpInputs = () => {
   const { signIn } = useAuthActions();

@@ -3,15 +3,15 @@
 import { UseGetAllSnippets } from "@/api/use-snippets-by-member";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import ProjectShowCaseSmall from "@/components/workspace/project-showcase-small";
-import CreateSnippetsModal from "@/components/workspace/use-create-snippents-modal";
 import { FilterIcon } from "lucide-react";
-
 import React from "react";
+import CreateSnippetForm from "@/features/snippets/form/create-snippets-form";
+import SnippetSkeleton from "@/features/snippets/ui/snippets-loading-card";
+import SnippetCard from "@/features/snippets/ui/snippets-card";
 
 const page = () => {
-  const { data: allSnippets, isLoading: loadingAllSnippets } =
-    UseGetAllSnippets();
+  const { data: allSnippets, isLoading: isLoading } = UseGetAllSnippets();
+
   return (
     <section className="flex flex-col w-full">
       <div
@@ -23,7 +23,7 @@ const page = () => {
           <div>
             <Input type="text" />
           </div>
-          <CreateSnippetsModal />
+          <CreateSnippetForm />
           <Button variant="outline" size="lg">
             <span>
               <FilterIcon />
@@ -34,17 +34,19 @@ const page = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-3 gap-4 ">
-        {allSnippets?.map((code) => (
-          <ProjectShowCaseSmall
-            key={code._id}
-            id={code._id}
-            userId={code.userId}
-            projectFiles={code.projectFiles}
-            projectName={code.projectName}
-            projectImage={code.projectImage}
-          />
-        ))}
+      <div className="grid mx-auto  mt-6 w-full grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 ">
+        {isLoading
+          ? Array.from({ length: 6 }).map((_, index) => (
+              <SnippetSkeleton key={index} />
+            ))
+          : allSnippets?.map((snippet) => (
+              <SnippetCard
+                key={snippet._id}
+                id={snippet._id}
+                {...snippet}
+                loading={false}
+              />
+            ))}
       </div>
     </section>
   );

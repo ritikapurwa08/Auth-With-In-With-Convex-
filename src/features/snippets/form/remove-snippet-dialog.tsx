@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Id } from "../../../convex/_generated/dataModel";
+
 import { useRemoveSnippets } from "@/api/use-remove-snippets";
 import {
   AlertDialog,
@@ -11,17 +11,18 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../ui/alert-dialog";
-import { Button } from "../ui/button";
+} from "@/components/ui/alert-dialog";
+import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import { Hint } from "../ui/hint";
+import { Hint } from "@/components/ui/hint";
+import { Id } from "../../../../convex/_generated/dataModel";
 
 interface RemoveSnippetsProps {
   id: Id<"snippets">;
 }
 
-const RemoveSnippets = ({ id }: RemoveSnippetsProps) => {
+const RemoveSnippetDialog = ({ id }: RemoveSnippetsProps) => {
   const [open, setOpen] = useState(false);
   const { toast } = useToast();
   const { mutate: remove, isPending: removingSnippets } = useRemoveSnippets();
@@ -85,4 +86,4 @@ const RemoveSnippets = ({ id }: RemoveSnippetsProps) => {
   );
 };
 
-export default RemoveSnippets;
+export default RemoveSnippetDialog;

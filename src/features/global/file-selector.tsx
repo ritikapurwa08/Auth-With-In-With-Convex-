@@ -1,8 +1,5 @@
-// SelectDemo.tsx
-import * as React from "react";
-import { Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import { Button } from "../ui/button";
-import { Hint } from "../ui/hint";
+import { Check, ChevronsUpDown } from "lucide-react";
+
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,13 +16,17 @@ interface ProjectFile {
   fileCode: string;
 }
 
-interface SelectDemoProps {
+interface FileSelectorProps {
   projectFiles: ProjectFile[];
   onSelectFile: (selectedFile: ProjectFile) => void;
 }
 
-export function SelectDemo({ projectFiles, onSelectFile }: SelectDemoProps) {
-  const [selectedFile, setSelectedFile] = React.useState<ProjectFile | null>(
+import React, { useState } from "react";
+import { Hint } from "@/components/ui/hint";
+import { Button } from "@/components/ui/button";
+
+const FileSelector = ({ onSelectFile, projectFiles }: FileSelectorProps) => {
+  const [selectedFile, setSelectedFile] = useState<ProjectFile | null>(
     projectFiles.length > 0 ? projectFiles[0] : null
   );
   const [open, setOpen] = React.useState(false);
@@ -72,4 +73,6 @@ export function SelectDemo({ projectFiles, onSelectFile }: SelectDemoProps) {
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
+
+export default FileSelector;
