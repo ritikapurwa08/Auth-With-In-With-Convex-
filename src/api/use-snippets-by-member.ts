@@ -1,7 +1,7 @@
 import { useQuery } from "convex/react";
 import { api } from "../../convex/_generated/api";
 
-export const useGetAllSnippets = () => {
+export const UseGetAllSnippets = () => {
   const data = useQuery(api.snippets.getAllSnippets);
   const isLoading = data === undefined;
 

@@ -30,7 +30,7 @@ export default function RootLayout({
           <html lang="en">
             <body
               className={cn(
-                "antialiased h-screen   w-full container ",
+                "antialiased h-screen flex flex-col   w-full container ",
                 inter.className,
                 roboto.className,
                 openSans.className
@@ -39,7 +39,9 @@ export default function RootLayout({
               <div>
                 <Navbar />
               </div>
-              <div className="max-w-7xl w-full mx-auto">{children}</div>
+              <div className="max-w-7xl min-h-full w-full mx-auto">
+                {children}
+              </div>
               <Toaster />
             </body>
           </html>

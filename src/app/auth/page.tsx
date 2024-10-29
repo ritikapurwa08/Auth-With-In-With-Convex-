@@ -13,7 +13,7 @@ const Page = () => {
     setRegisterType((prev) => (prev === "signUp" ? "signIn" : "signUp"));
   };
   return (
-    <section className="flex items-center h-full w-full justify-center max-w-md mx-auto">
+    <section className="flex items-center  h-[70vh] w-full justify-center max-w-md mx-auto">
       <Card className="p-4 mx-4 w-full">
         <CardHeader>
           <CardTitle>

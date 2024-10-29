@@ -1,21 +1,12 @@
 import React, { useState } from "react";
-import SyntaxHighlighter from "react-syntax-highlighter";
-import { docco, dark } from "react-syntax-highlighter/dist/esm/styles/hljs";
-import { Card, CardContent } from "@/components/ui/card";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Id } from "../../../convex/_generated/dataModel";
-import UpdateSnippetModal from "./use-update-snippets-modal";
-import RemoveSnippets from "./use-remove-snippet";
 import { useCurrentUser } from "@/api/user";
-
-export const fileTypes = [
-  { label: "JavaScript", value: "javascript" },
-  { label: "React", value: "react" },
-  { label: "Next.js", value: "next_js" },
-  { label: "TypeScript", value: "typescript" },
-  { label: "HTML", value: "html" },
-  { label: "CSS", value: "css" },
-];
+import { Button } from "../ui/button";
+import { ChevronRight, Pencil, FileCode, Trash2 } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Hint } from "../ui/hint";
+import SyntaxHighlighter from "react-syntax-highlighter";
+import { atomOneDark } from "react-syntax-highlighter/dist/esm/styles/hljs";
 
 interface ProjectFile {
   fileName: string;
@@ -23,7 +14,7 @@ interface ProjectFile {
   fileCode: string;
 }
 
-interface CodeBlockSmallProps {
+interface ShowCodeSmallProps {
   id: Id<"snippets">;
   userId: Id<"users">;
   projectName: string;
@@ -31,108 +22,119 @@ interface CodeBlockSmallProps {
   projectFiles: ProjectFile[];
 }
 
-const CodeBlockSmall: React.FC<CodeBlockSmallProps> = ({
-  projectName,
+const CodeView = ({
+  projectFiles,
+  selectedFile,
+}: {
+  projectFiles: ProjectFile[];
+  selectedFile: string;
+}) => {
+  const selectedFileData = projectFiles.find(
+    (file) => file.fileName === selectedFile
+  );
+
+  return (
+    <div className="relative w-full">
+      <div className="custom-scrollbar overflow-auto max-h-40">
+        <SyntaxHighlighter
+          language={selectedFileData?.fileType.toLowerCase() || "javascript"}
+          style={atomOneDark}
+          customStyle={{
+            margin: 0,
+            padding: "1rem",
+            background: "rgb(40, 44, 52)",
+            borderRadius: "0.5rem",
+            fontSize: "0.675rem",
+          }}
+        >
+          {selectedFileData?.fileCode || ""}
+        </SyntaxHighlighter>
+      </div>
+    </div>
+  );
+};
+
+const FileSelector = ({
+  projectFiles,
+  selectedFile,
+  onSelectFile,
+}: {
+  projectFiles: ProjectFile[];
+  selectedFile: string;
+  onSelectFile: (fileName: string) => void;
+}) => {
+  return (
+    <div className="flex gap-2 mb-4 overflow-x-auto custom-scrollbar-x pb-2">
+      {projectFiles.map((file) => (
+        <Button
+          key={file.fileName}
+          variant={selectedFile === file.fileName ? "secondary" : "outline"}
+          size="sm"
+          className="flex items-center gap-2 shrink-0"
+          onClick={() => onSelectFile(file.fileName)}
+        >
+          <FileCode className="h-4 w-4" />
+          <span>{file.fileName}</span>
+          {selectedFile === file.fileName && (
+            <ChevronRight className="h-4 w-4" />
+          )}
+        </Button>
+      ))}
+    </div>
+  );
+};
+
+const ShowCodeSmall = ({
   id,
+  projectFiles,
+  projectName,
   userId,
   projectImage,
-  projectFiles,
-}) => {
-  const [activeFile, setActiveFile] = useState(projectFiles[0]?.fileName || "");
-
-  // Helper function to determine language for syntax highlighting
-  const getLanguage = (fileType: string) => {
-    const languageMap: { [key: string]: string } = {
-      js: "javascript",
-      jsx: "jsx",
-      ts: "typescript",
-      tsx: "typescript",
-      py: "python",
-      html: "html",
-      css: "css",
-      json: "json",
-    };
-
-    const extension = fileType.toLowerCase().replace(".", "");
-    return languageMap[extension] || "text";
-  };
-
-  const { isLoading: userLoding, user: currentUser } = useCurrentUser();
+}: ShowCodeSmallProps) => {
+  const { isLoading: userLoading, user: currentUser } = useCurrentUser();
+  const [selectedFile, setSelectedFile] = useState(
+    projectFiles[0]?.fileName || ""
+  );
 
   const isOwner = currentUser?._id === userId;
 
   return (
-    <Card className="w-full  bg-white dark:bg-gray-800 shadow-lg">
-      {/* Project Header */}
-      <div className="p-4 flex justify-between w-full border-b border-gray-700">
-        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
-          {projectName}
-        </h3>
+    <Card className="w-full h-96 flex flex-col">
+      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
+        <CardTitle className="text-lg font-semibold">{projectName}</CardTitle>
         {isOwner && (
-          <div className="flex flex-row justify-center items-center w-full gap-x-2">
-            <UpdateSnippetModal id={id} />
-            <RemoveSnippets id={id} />
+          <div className="flex items-center gap-2">
+            <Hint label="Edit Project">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Pencil className="h-4 w-4" />
+              </Button>
+            </Hint>
+            <Hint label="Delete Project">
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Trash2 className="h-4 w-4 text-red-500" />
+              </Button>
+            </Hint>
+            <Hint label="Select File"></Hint>
           </div>
         )}
-      </div>
-
-      {/* File Tabs and Code Display */}
-      <CardContent className="p-0">
-        <Tabs
-          defaultValue={activeFile}
-          value={activeFile}
-          onValueChange={setActiveFile}
-          className="w-full"
-        >
-          {/* File Tabs */}
-          <div className="border-b dark:border-gray-700">
-            <TabsList className="flex overflow-x-auto p-0 bg-gray-50 dark:bg-gray-900">
-              {projectFiles.map((file) => (
-                <TabsTrigger
-                  key={file.fileName}
-                  value={file.fileName}
-                  className="px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-800 data-[state=active]:border-b-2 data-[state=active]:border-blue-500"
-                >
-                  {file.fileName}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
-
-          {/* Code Content */}
-          {projectFiles.map((file) => (
-            <TabsContent
-              key={file.fileName}
-              value={file.fileName}
-              className="m-0"
-            >
-              <div className="relative">
-                <div className="absolute right-2 top-2 text-xs text-gray-500 dark:text-gray-400">
-                  {file.fileType}
-                </div>
-                <SyntaxHighlighter
-                  language="javascript"
-                  style={dark}
-                  customStyle={{
-                    margin: 0,
-                    borderRadius: "0 0 0.5rem 0.5rem",
-                    padding: "1.5rem",
-                    fontSize: "0.9rem",
-                    backgroundColor: "#eeeee",
-                  }}
-                  showLineNumbers
-                  wrapLines
-                  wrapLongLines
-                >
-                  {file.fileCode}
-                </SyntaxHighlighter>
-              </div>
-            </TabsContent>
-          ))}
-        </Tabs>
+      </CardHeader>
+      <CardContent className="flex-1 flex flex-col">
+        <FileSelector
+          projectFiles={projectFiles}
+          selectedFile={selectedFile}
+          onSelectFile={setSelectedFile}
+        />
+        <div className="flex-1 min-h-0">
+          <CodeView projectFiles={projectFiles} selectedFile={selectedFile} />
+        </div>
       </CardContent>
     </Card>
   );
 };
 
-export default CodeBlockSmall;
+// Add this CSS to your global styles
+const styles = `
+  
+`;
+
+export default ShowCodeSmall;

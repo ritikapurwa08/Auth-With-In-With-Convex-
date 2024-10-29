@@ -15,6 +15,7 @@ import {
 import { Button } from "../ui/button";
 import { Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { Hint } from "../ui/hint";
 
 interface RemoveSnippetsProps {
   id: Id<"snippets">;
@@ -50,12 +51,13 @@ const RemoveSnippets = ({ id }: RemoveSnippetsProps) => {
 
   return (
     <AlertDialog open={open} onOpenChange={setOpen}>
-      <AlertDialogTrigger asChild>
-        <Button>
-          <Trash2 className="h-4 w-4" />
-          <span>Remove </span>
-        </Button>
-      </AlertDialogTrigger>
+      <Hint label="Remove Snippets">
+        <AlertDialogTrigger asChild>
+          <Button variant="outline" size="icon">
+            <Trash2 className="size-5 text-red-500 " />
+          </Button>
+        </AlertDialogTrigger>
+      </Hint>
 
       <AlertDialogContent>
         <AlertDialogHeader>

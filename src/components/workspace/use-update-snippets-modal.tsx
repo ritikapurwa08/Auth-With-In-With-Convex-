@@ -15,7 +15,7 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "../ui/button";
-import { PlusCircle, Loader2, X, Plus } from "lucide-react";
+import { PlusCircle, Loader2, X, Plus, Edit2Icon } from "lucide-react";
 import { Form } from "../ui/form";
 import { Alert, AlertDescription } from "../ui/alert";
 import CustomInput from "../providers/custom-input";
@@ -23,6 +23,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import CustomSelect from "../providers/custom-select";
 import CustomTextarea from "../providers/custom-textarea";
 import { useCurrentUser } from "@/api/user";
+import { Hint } from "../ui/hint";
 
 interface UpdateSnippetsProps {
   id: Id<"snippets">;
@@ -110,12 +111,13 @@ const UpdateSnippetModal = ({ id }: UpdateSnippetsProps) => {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button variant="default" className="gap-2">
-          <PlusCircle className="h-4 w-4" />
-          Edit Project
-        </Button>
-      </DialogTrigger>
+      <Hint label="Update Snippets">
+        <DialogTrigger asChild>
+          <Button variant="outline" size="icon" className="gap-2">
+            <Edit2Icon className="size-5 text-blue-500 font-bold" />
+          </Button>
+        </DialogTrigger>
+      </Hint>
 
       <DialogContent className="sm:max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
