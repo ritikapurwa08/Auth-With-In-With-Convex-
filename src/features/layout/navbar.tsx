@@ -1,11 +1,12 @@
 "use client";
 
 import React from "react";
-import UserButton from "../auth/user-button";
+
 import { SiCodeblocks } from "react-icons/si";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { cn } from "@/lib/utils";
+import UserButton from "../auth/user-button";
 
 const Navbar = () => {
   const pathName = usePathname();

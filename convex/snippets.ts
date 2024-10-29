@@ -2,6 +2,7 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 import { getAuthUserId } from "@convex-dev/auth/server";
 import { ConvexError } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 export const create = mutation({
   args: {
@@ -111,7 +112,7 @@ export const remove = mutation({
       // Delete the snippet from the database
       await ctx.db.delete(args.id);
     } catch (error) {
-      throw new ConvexError(`Failed to delete project:`);
+      throw new ConvexError(`Failed to delete project:${error}`);
     }
 
     return args.id;
@@ -151,7 +152,7 @@ export const cleanupOrphanedImage = mutation({
         message: "Orphaned image deleted successfully",
       };
     } catch (error) {
-      throw new ConvexError(`Failed to delete orphaned image: `);
+      throw new ConvexError(`Failed to delete orphaned image:${error}`);
     }
   },
 });
@@ -175,5 +176,39 @@ export const getAllSnippets = query({
     const snippets = await ctx.db.query("snippets").collect();
 
     return snippets;
+  },
+});
+
+export const getPaginatedSnippets = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    // Get authenticated user
+    const userId = await getAuthUserId(ctx);
+    if (!userId) {
+      throw new Error("Authentication required");
+    }
+
+    // Query snippets with pagination
+    const results = await ctx.db
+      .query("snippets")
+      .withIndex("by_user", (q) => q.eq("userId", userId))
+      .order("desc")
+      .paginate(args.paginationOpts);
+
+    // Process and return results
+    return {
+      ...results,
+      page: await Promise.all(
+        results.page.map(async (snippet) => {
+          // Add any additional processing here if needed
+          return {
+            ...snippet,
+            formattedDate: new Date(snippet._creationTime).toLocaleDateString(),
+          };
+        })
+      ),
+    };
   },
 });

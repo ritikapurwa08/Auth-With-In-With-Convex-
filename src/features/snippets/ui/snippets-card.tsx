@@ -1,4 +1,3 @@
-import { Skeleton } from "@/components/ui/skeleton";
 import { Id } from "../../../../convex/_generated/dataModel";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import UpdateSnippetForm from "../form/update-snippets-form";
@@ -15,7 +14,6 @@ interface SnippetFile {
   fileCode: string;
 }
 interface SnippetCardProps {
-  loading: boolean;
   id: Id<"snippets">;
   userId: Id<"users">;
   projectName: string;
@@ -28,7 +26,6 @@ const SnippetCard = ({
   projectFiles,
   projectName,
   userId,
-  loading,
 }: SnippetCardProps) => {
   const [selectedFile, setSelectedFile] = useState<SnippetFile | null>(
     projectFiles.length > 0 ? projectFiles[0] : null
@@ -46,7 +43,7 @@ const SnippetCard = ({
         <div className="flex flex-row justify-between items-center">
           <div id="project-name">
             <CardTitle className="text-sm lg:max-w-48 truncate max-w-40 ">
-              {loading ? <Skeleton className="size-full" /> : projectName}
+              {projectName}
             </CardTitle>
           </div>
           <div id="project-options" className="flex flex-row gap-x-1">
