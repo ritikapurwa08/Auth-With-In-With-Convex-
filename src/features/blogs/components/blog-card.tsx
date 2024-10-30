@@ -58,6 +58,7 @@ const BlogCard = ({
             className="object-cover w-full h-full"
           />
         </div>
+        // todo fix its ui and make it more beautiful
       )}
       <div className="px-6 py-4">
         <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
