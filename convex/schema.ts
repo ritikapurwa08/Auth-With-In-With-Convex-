@@ -5,9 +5,17 @@ import { v } from "convex/values";
 const schema = defineSchema({
   ...authTables,
 
-  courses: defineTable({
-    name: v.string(),
-    price: v.number(),
+  blog: defineTable({
+    image: v.optional(v.id("_storage")),
+    userId: v.id("users"),
+    title: v.string(),
+    description: v.string(),
+    updatedAt: v.optional(v.number()),
+  }),
+  reactions: defineTable({
+    blogId: v.id("blog"),
+    userId: v.id("users"),
+    value: v.string(),
   }),
 
   snippets: defineTable({
