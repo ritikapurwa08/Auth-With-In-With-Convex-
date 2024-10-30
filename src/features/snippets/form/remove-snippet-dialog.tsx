@@ -14,9 +14,9 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import { Trash2 } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { Hint } from "@/components/ui/hint";
 import { Id } from "../../../../convex/_generated/dataModel";
+import { toast } from "sonner";
 
 interface RemoveSnippetsProps {
   id: Id<"snippets">;
@@ -24,7 +24,6 @@ interface RemoveSnippetsProps {
 
 const RemoveSnippetDialog = ({ id }: RemoveSnippetsProps) => {
   const [open, setOpen] = useState(false);
-  const { toast } = useToast();
   const { mutate: remove, isPending: removingSnippets } = useRemoveSnippets();
 
   const handleRemove = () => {
@@ -37,10 +36,8 @@ const RemoveSnippetDialog = ({ id }: RemoveSnippetsProps) => {
         },
         onSuccess() {
           setOpen(false);
-          toast({
-            title: "Snippet removed",
-            description: "Snippet has been removed successfully",
-          });
+          toast.success("Snippet has been removed successfully");
+
           // You could add success toast notification here
         },
         onSettled() {

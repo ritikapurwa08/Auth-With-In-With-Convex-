@@ -7,16 +7,16 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Form } from "@/components/ui/form";
 import { LockIcon, MailIcon, TriangleAlertIcon } from "lucide-react";
-import { useToast } from "@/hooks/use-toast";
 import { useRouter } from "next/navigation";
 import { AuthSignUpSchema, AuthSignUpSchemaType } from "@/app/auth/auth.types";
 import CustomInput from "@/features/global/form-provider/custom-input";
 import CustomLoader from "@/features/global/ui/custom-loader";
 import CustomPasswordInput from "@/features/global/form-provider/custom-password-input";
+import { toast } from "sonner";
 
 const SignUpInputs = () => {
   const { signIn } = useAuthActions();
-  const { toast } = useToast();
+
   const [pending, setPending] = useState(false);
   const [error, setError] = useState("");
   const router = useRouter();
@@ -41,21 +41,14 @@ const SignUpInputs = () => {
       flow: "signUp",
     })
       .then(() => {
-        toast({
-          title: "Success",
-          description: `Successfully Signed Up User`,
-        });
+        toast.success("sign in succcessfully");
         router.push("/");
       })
 
       .catch((error) => {
         setError(error);
         console.log(error);
-        toast({
-          title: "Error",
-          description: "your are not signed in sign up first",
-          variant: "destructive",
-        });
+        toast.error("you are not signed up , create account");
       })
       .finally(() => {
         setPending(false);

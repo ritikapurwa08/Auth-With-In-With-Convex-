@@ -1,68 +1,26 @@
 "use client";
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  useMemo,
-  useCallback,
-} from "react";
-import { FilterIcon } from "lucide-react";
-import { UseGetPaginatedSnippets } from "@/api/use-paginated-snippets";
+import React, { useState, useMemo } from "react";
+import { FilterIcon, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { UseGetPaginatedSnippets } from "@/api/use-paginated-snippets";
 import CreateSnippetForm from "@/features/snippets/form/create-snippets-form";
 import SnippetSkeleton from "@/features/snippets/ui/snippets-loading-card";
 import SnippetCard from "@/features/snippets/ui/snippets-card";
 import Link from "next/link";
 import { useDebounce } from "@/features/global/use-debounce";
 
-// You'll need to create this hook
-
 const SKELETON_COUNT = 6;
 const LOADING_MORE_COUNT = 3;
 
-const SnippetsPage: React.FC = () => {
+const SnippetsPage = () => {
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
 
-  // Memoize the pagination hook to prevent unnecessary re-fetching
-  const { loadMore, results, status } = UseGetPaginatedSnippets();
-
-  // Memoize the intersection observer callback
-  const observerCallback = useCallback(
-    ([entry]: IntersectionObserverEntry[]) => {
-      if (entry.isIntersecting && status === "CanLoadMore") {
-        loadMore();
-      }
-    },
-    [loadMore, status]
-  );
-
-  // Memoize the intersection observer options
-  const observerOptions = useMemo(
-    () => ({
-      threshold: 0.1,
-      rootMargin: "400px",
-    }),
-    []
-  );
-
-  // Memoize the load more ref setup
-  useEffect(() => {
-    const currentRef = loadMoreRef.current;
-    if (!currentRef) return;
-
-    const observer = new IntersectionObserver(
-      observerCallback,
-      observerOptions
-    );
-    observer.observe(currentRef);
-
-    return () => observer.disconnect();
-  }, [observerCallback, observerOptions]);
-
-  const loadMoreRef = useRef<HTMLDivElement>(null);
+  // Use Convex's pagination hook
+  const { results, status, loadMore } = UseGetPaginatedSnippets();
 
   // Memoize the filtered results
   const filteredResults = useMemo(() => {
@@ -74,41 +32,40 @@ const SnippetsPage: React.FC = () => {
     );
   }, [results, debouncedSearch]);
 
-  // Memoize the loading states
-  const showLoadingMore = useMemo(
-    () => status === "LoadingMore" || status === "CanLoadMore",
-    [status]
+  // Handle load more with loading state
+  const handleLoadMore = async () => {
+    setIsLoadingMore(true);
+    try {
+      await loadMore();
+    } finally {
+      // Add a small delay to ensure smooth transition
+      setTimeout(() => {
+        setIsLoadingMore(false);
+      }, 500);
+    }
+  };
+
+  const SkeletonGrid = ({ count }: { count: number }) => (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {Array.from({ length: count }).map((_, index) => (
+        <SnippetSkeleton key={`skeleton-${index}`} />
+      ))}
+    </div>
   );
 
-  // Memoize the skeleton grid
-  const SkeletonGrid = useCallback(
-    ({ count }: { count: number }) => (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: count }).map((_, index) => (
-          <SnippetSkeleton key={`skeleton-${index}`} />
-        ))}
-      </div>
-    ),
-    []
-  );
-
-  // Memoize the snippet grid
-  const SnippetGrid = useCallback(
-    () => (
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {filteredResults.map((snippet) => (
-          <SnippetCard
-            key={snippet._id}
-            id={snippet._id}
-            projectFiles={snippet.projectFiles}
-            projectName={snippet.projectName}
-            userId={snippet.userId}
-            projectImage={snippet.projectImage}
-          />
-        ))}
-      </div>
-    ),
-    [filteredResults]
+  const SnippetGrid = () => (
+    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+      {filteredResults.map((snippet) => (
+        <SnippetCard
+          key={snippet._id}
+          id={snippet._id}
+          projectFiles={snippet.projectFiles}
+          projectName={snippet.projectName}
+          userId={snippet.userId}
+          projectImage={snippet.projectImage}
+        />
+      ))}
+    </div>
   );
 
   return (
@@ -130,9 +87,8 @@ const SnippetsPage: React.FC = () => {
           <Button asChild variant="outline" size="lg">
             <Link href="/snippets/my-snippets">Your Snippets</Link>
           </Button>
+          <CreateSnippetForm />
         </div>
-
-        <CreateSnippetForm />
       </div>
 
       <div className="space-y-6">
@@ -142,9 +98,29 @@ const SnippetsPage: React.FC = () => {
           <>
             <SnippetGrid />
 
-            {showLoadingMore && (
+            {(status === "LoadingMore" || isLoadingMore) && (
               <div className="mt-4 animate-fade-in">
                 <SkeletonGrid count={LOADING_MORE_COUNT} />
+              </div>
+            )}
+
+            {status === "CanLoadMore" && (
+              <div className="flex justify-center mt-8">
+                <Button
+                  onClick={handleLoadMore}
+                  size="lg"
+                  className="min-w-[200px]"
+                  disabled={isLoadingMore}
+                >
+                  {isLoadingMore ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                      <span>Loading...</span>
+                    </div>
+                  ) : (
+                    "Load More"
+                  )}
+                </Button>
               </div>
             )}
 
@@ -155,8 +131,6 @@ const SnippetsPage: React.FC = () => {
             )}
           </>
         )}
-
-        {status !== "Exhausted" && <div ref={loadMoreRef} className="h-4" />}
       </div>
     </main>
   );

@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { Id } from "../../../../convex/_generated/dataModel";
-import { useToast } from "@/hooks/use-toast";
 import { useFieldArray, useForm } from "react-hook-form";
 import { projectSchemaZod, ProjectTypeZod } from "@/api/use-create-snippets";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +22,7 @@ import CustomInput from "@/features/global/form-provider/custom-input";
 import { Card, CardContent } from "@/components/ui/card";
 import CustomSelect from "@/features/global/form-provider/custom-select";
 import CustomTextarea from "@/features/global/form-provider/custom-textarea";
+import { toast } from "sonner";
 
 interface UpdateSnippetsFormProps {
   id: Id<"snippets">;
@@ -31,8 +31,6 @@ interface UpdateSnippetsFormProps {
 const UpdateSnippetForm = ({ id }: UpdateSnippetsFormProps) => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
-
-  const { toast } = useToast();
 
   const form = useForm<ProjectTypeZod>({
     resolver: zodResolver(projectSchemaZod),
@@ -78,10 +76,7 @@ const UpdateSnippetForm = ({ id }: UpdateSnippetsFormProps) => {
       },
       {
         onSuccess(data) {
-          toast({
-            title: "Success!",
-            description: `Project updated successfully here is id ${data}`,
-          });
+          toast.success(`Project updated successfully here is id ${data}`);
           form.reset();
           setOpen(false);
         },

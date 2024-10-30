@@ -15,6 +15,8 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import { Eye, EyeOff, LucideIcon } from "lucide-react";
 import { IconType } from "react-icons";
+import { Button } from "@/components/ui/button";
+import { Hint } from "@/components/ui/hint";
 
 interface CustomPasswordInputProps<T extends FieldValues> {
   control: Control<T>;
@@ -83,17 +85,20 @@ const CustomPasswordInput = <T extends FieldValues>({
               onChange?.(e);
             }}
           />
-          <button
-            type="button"
-            onClick={toggle}
-            className="absolute right-3 top-1/2 transform -translate-y-1/2"
-          >
-            {showPassword ? (
-              <EyeOff className="size-3.5 text-muted-foreground" />
-            ) : (
-              <Eye className="size-3.5 text-muted-foreground" />
-            )}
-          </button>
+          <Hint label={`${showPassword ? "hide password" : "show password"}`}>
+            <Button
+              type="button"
+              onClick={toggle}
+              variant="ghost"
+              className="absolute size-8   right-3 top-1/2 transform -translate-y-1/2"
+            >
+              {showPassword ? (
+                <EyeOff className="size-3.5 text-muted-foreground" />
+              ) : (
+                <Eye className="size-3.5 text-muted-foreground" />
+              )}
+            </Button>
+          </Hint>
         </div>
       </FormControl>
       <FormMessage>

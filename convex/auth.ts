@@ -16,5 +16,3 @@ export const CustomPassword = Password({
 export const { auth, signIn, signOut, store } = convexAuth({
   providers: [GitHub, Google, CustomPassword],
 });
-
-

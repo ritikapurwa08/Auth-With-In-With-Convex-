@@ -1,12 +1,30 @@
 import { usePaginatedQuery } from "convex/react";
-
 import { api } from "@/../convex/_generated/api";
 import type { Id } from "@/../convex/_generated/dataModel";
 
 const BATCH_SIZE = 6;
 
-export type GetMessagesReturnType =
-  (typeof api.snippets.getPaginatedSnippets._returnType)["page"];
+interface SnippetFile {
+  fileName: string;
+  fileType: string;
+  fileCode: string;
+}
+
+export type SnippetType = {
+  _id: Id<"snippets">;
+  _creationTime: number;
+  projectName: string;
+  projectFiles: SnippetFile[];
+  userId: Id<"users">;
+  projectImage?: string;
+  formattedDate: string;
+};
+
+export type PaginationStatus =
+  | "LoadingFirstPage"
+  | "LoadingMore"
+  | "CanLoadMore"
+  | "Exhausted";
 
 export const UseGetPaginatedSnippets = () => {
   const { results, status, loadMore } = usePaginatedQuery(
@@ -16,8 +34,8 @@ export const UseGetPaginatedSnippets = () => {
   );
 
   return {
-    results,
-    status,
+    results: results as SnippetType[],
+    status: status as PaginationStatus,
     loadMore: () => loadMore(BATCH_SIZE),
   };
 };

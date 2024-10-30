@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import { useToast } from "@/hooks/use-toast";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import {
@@ -23,12 +22,12 @@ import {
   ProjectTypeZod,
   useCreateSnippets,
 } from "@/api/use-create-snippets";
+import { toast } from "sonner";
 
 const CreateSnippetForm = () => {
   const [open, setOpen] = useState(false);
   const [error, setError] = useState("");
 
-  const { toast } = useToast();
   const form = useForm<ProjectTypeZod>({
     resolver: zodResolver(projectSchemaZod),
     defaultValues: {
@@ -64,19 +63,13 @@ const CreateSnippetForm = () => {
         onSuccess(data) {
           form.reset();
           setOpen(false);
-          toast({
-            title: "Success!",
-            description: `Project created successfully here is id ${data}`,
-            variant: "default",
-          });
+
+          toast.success(`Project created successfully here is id ${data}`);
         },
         onError() {
           setError(error);
-          toast({
-            title: "!Error",
-            description: `Failed to create project ${error}`,
-            variant: "default",
-          });
+          toast.success(`Failed to create project ${error}`);
+
           setOpen(true);
         },
         onSettled() {},
