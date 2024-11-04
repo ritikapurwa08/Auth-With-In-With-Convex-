@@ -10,10 +10,18 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { Loader, LogOut } from "lucide-react";
+import {
+  BoxIcon,
+  Code2Icon,
+  Contact2Icon,
+  HomeIcon,
+  Loader,
+  LogOut,
+} from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { UseCurrentUser } from "@/api/user";
+import Link from "next/link";
 
 const UserButton = () => {
   const [currentCharacterIndex, setCurrentCharacterIndex] = useState(0);
@@ -83,47 +91,61 @@ const UserButton = () => {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent
-        className="w-80"
-        align="end"
+        className="w-60"
+        align="center"
         side="bottom"
         forceMount
       >
-        <div className="flex flex-row">
-          <DropdownMenuItem className="">
+        <DropdownMenuItem>
+          <HomeIcon className="size-4 text-red-400" />
+          <Link href="/">Home</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Code2Icon className="size-4 text-red-400" />
+          <Link href="/snippets">Snippets</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <BoxIcon className="size-4 text-red-400" />
+          <Link href="/blog">Blog</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <Contact2Icon className="size-4 text-red-400" />
+          <Link href="/contact">Contact</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
+          <div className="flex flex-row w-full items-center justify-between">
             <div className="flex flex-col items-start p-1">
-              <span className="text-sm font-semibold">{currentUser?.name}</span>
+              <span className="text-sm font-semibold capitalize">
+                {currentUser?.name}
+              </span>
               <span className="text-xs text-muted-foreground font-medium">
                 {currentUser?.email}
               </span>
             </div>
-          </DropdownMenuItem>
-
-          <DropdownMenuItem
-            className="cursor-pointer flex items-center p-2 text-sm"
-            onSelect={(event) => {
-              event.preventDefault();
-              if (!userLoading) {
-                handleSignOut().catch((error) =>
-                  console.error("Sign out handler failed:", error)
-                );
-              }
-            }}
-            disabled={userLoading}
-          >
-            {isPending ? (
-              <Loader className="mr-2 h-4 w-4 animate-spin" />
-            ) : (
-              <LogOut className="mr-2 h-4 w-4" />
-            )}
-            <span>
-              {userLoading
-                ? "Loading..."
-                : isPending
-                  ? "Signing out..."
-                  : "Sign out"}
-            </span>
-          </DropdownMenuItem>
-        </div>
+            <div>
+              <Button
+                onClick={handleSignOut}
+                onSelect={(event) => {
+                  event.preventDefault();
+                  if (!userLoading) {
+                    handleSignOut().catch((error) =>
+                      console.error("Sign out handler failed:", error)
+                    );
+                  }
+                }}
+                variant="outline"
+                size="icon"
+                disabled={userLoading}
+              >
+                {isPending ? (
+                  <Loader className=" size-4 animate-spin" />
+                ) : (
+                  <LogOut className=" size-4 h-4 w-4" />
+                )}
+              </Button>
+            </div>
+          </div>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );

@@ -31,18 +31,16 @@ export default function RootLayout({
           <html lang="en">
             <body
               className={cn(
-                "antialiased h-screen flex flex-col   w-full container ",
+                "antialiased   ",
                 inter.className,
                 roboto.className,
                 openSans.className
               )}
             >
-              <div>
-                <Navbar />
-              </div>
-              <div className="max-w-7xl min-h-full w-full mx-auto">
-                {children}
-              </div>
+              <Navbar />
+
+              <main className="max-w-7xl mx-auto px-6">{children}</main>
+
               <Toaster />
             </body>
           </html>
