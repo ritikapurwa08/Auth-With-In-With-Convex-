@@ -78,19 +78,19 @@ const MoreSkills = () => {
           {[...Array(2)].map((_, arrayIndex) => (
             <div
               key={`skill-group-${arrayIndex}`}
-              className="flex-[0_0_100%] min-w-0 grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8"
+              className="flex-[0_0_100%] min-w-0 grid grid-cols-1 xs:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-8"
             >
               {skills.map((skill, index) => (
                 <div
                   key={`skill-${index}-${arrayIndex}`}
                   className="flex flex-col items-center justify-center cursor-pointer p-4 hover:transform hover:scale-105 transition-transform duration-300"
                 >
-                  <div className="relative w-32 h-32 mb-4">
+                  <div className="relative size-24 mb-4">
                     <Image
                       src={skill.icon}
                       alt={skill.alt}
                       fill
-                      className="object-contain"
+                      className="object-cover min-w-24 min-h-24 max-h-24 max-w-24 size-24"
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                     />
                   </div>
