@@ -54,7 +54,7 @@ const SnippetsPage = () => {
     if (newPage < 1 || newPage > totalPages) return;
 
     if (newPage > page && status === "CanLoadMore") {
-      await loadMore();
+      loadMore();
     }
 
     setPage(newPage);

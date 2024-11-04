@@ -18,6 +18,9 @@ const FilterSnippets = () => {
       </DropdownMenuTrigger>
       <DropdownMenuContent side="bottom" className="w-56">
         <DropdownMenuItem>
+          <Link href="/snippets">All Snippets</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem>
           <Link href="/snippets/my-snippets">Your Snippets</Link>
         </DropdownMenuItem>
         <DropdownMenuItem>TypeScript</DropdownMenuItem>
