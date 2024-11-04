@@ -201,10 +201,13 @@ export const getPaginatedSnippets = query({
       ...results,
       page: await Promise.all(
         results.page.map(async (snippet) => {
+          const formattedDate = new Date(
+            snippet._creationTime
+          ).toLocaleDateString();
           // Add any additional processing here if needed
           return {
             ...snippet,
-            formattedDate: new Date(snippet._creationTime).toLocaleDateString(),
+            formattedDate,
           };
         })
       ),
@@ -243,5 +246,47 @@ export const getOwnPaginatedSnippets = query({
         })
       ),
     };
+  },
+});
+
+export const getSnippetsBySearch = query({
+  args: {
+    search: v.string(),
+  },
+  handler: async (ctx, args) => {
+    if (args.search === "") {
+      return await ctx.db.query("snippets").order("desc").collect();
+    }
+    const authorSearch = await ctx.db
+      .query("snippets")
+      .withSearchIndex("search_author", (q) => q.search("userId", args.search))
+
+      .take(10);
+
+    if (authorSearch.length > 0) {
+      return authorSearch;
+    }
+
+    const titleSearch = await ctx.db
+      .query("snippets")
+      .withSearchIndex("search_title", (q) =>
+        q.search("projectName", args.search)
+      )
+      .take(10);
+
+    if (titleSearch.length > 0) {
+      return titleSearch;
+    }
+
+    const searchBody = await ctx.db
+      .query("snippets")
+      .withSearchIndex("search_files", (q) =>
+        q.search("projectFiles", args.search)
+      )
+      .take(10);
+
+    if (searchBody.length > 0) {
+      return searchBody;
+    }
   },
 });

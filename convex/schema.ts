@@ -29,7 +29,11 @@ const schema = defineSchema({
         fileCode: v.string(),
       })
     ),
-  }).index("by_user", ["userId"]),
+  })
+    .index("by_user", ["userId"])
+    .searchIndex("search_author", { searchField: "userId" })
+    .searchIndex("search_files", { searchField: "projectFiles" })
+    .searchIndex("search_title", { searchField: "projectName" }),
 });
 
 export default schema;

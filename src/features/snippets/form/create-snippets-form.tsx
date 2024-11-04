@@ -80,9 +80,8 @@ const CreateSnippetForm = () => {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button variant="default" className="gap-2">
+        <Button variant="default" size="icon" className="gap-2">
           <PlusCircle className="size-5 text-green-600" />
-          Create Project
         </Button>
       </DialogTrigger>
       <DialogContent>

@@ -1,139 +1,115 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import { FilterIcon, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import React, { memo, useMemo } from "react";
 import { UseGetPaginatedSnippets } from "@/api/use-paginated-snippets";
-import CreateSnippetForm from "@/features/snippets/form/create-snippets-form";
 import SnippetSkeleton from "@/features/snippets/ui/snippets-loading-card";
 import SnippetCard from "@/features/snippets/ui/snippets-card";
-import Link from "next/link";
-import { useDebounce } from "@/features/global/use-debounce";
+import CreateSnippetForm from "@/features/snippets/form/create-snippets-form";
+import PaginationComponent from "@/features/snippets/ui/pagination";
+import FilterSnippets from "@/features/snippets/ui/filter-snippets";
+import SearchComponent, {
+  SearchedSnippetType,
+  useSnippetsSearch,
+} from "@/features/snippets/ui/searched-component";
 
-const SKELETON_COUNT = 6;
-const LOADING_MORE_COUNT = 3;
+const LoadingBlog = memo(() => (
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+    {Array.from({ length: 6 }).map((_, index) => (
+      <SnippetSkeleton key={`skeleton-${index}`} />
+    ))}
+  </div>
+));
+
+LoadingBlog.displayName = "LoadingBlog";
+
+const SnippetsGrid = memo(({ items }: { items: SearchedSnippetType[] }) => (
+  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+    {items.map((snippet) => (
+      <SnippetCard
+        key={snippet._id}
+        id={snippet._id}
+        projectFiles={snippet.projectFiles}
+        projectName={snippet.projectName}
+        userId={snippet.userId}
+        projectImage={snippet.projectImage}
+      />
+    ))}
+  </div>
+));
+
+SnippetsGrid.displayName = "SnippetsGrid";
 
 const SnippetsPage = () => {
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const debouncedSearch = useDebounce(searchQuery, 300);
+  const [page, setPage] = React.useState(1);
+  const { results: snippets, status, loadMore } = UseGetPaginatedSnippets();
+  const { searchText, searchResults, handleSearch, isSearching } =
+    useSnippetsSearch();
 
-  // Use Convex's pagination hook
-  const { results, status, loadMore } = UseGetPaginatedSnippets();
+  const totalPages = useMemo(
+    () => Math.ceil(snippets.length / 4),
+    [snippets.length]
+  );
 
-  // Memoize the filtered results
-  const filteredResults = useMemo(() => {
-    if (!results) return [];
-    if (!debouncedSearch) return results;
+  const handlePageChange = async (newPage: number) => {
+    if (newPage < 1 || newPage > totalPages) return;
 
-    return results.filter((snippet) =>
-      snippet.projectName.toLowerCase().includes(debouncedSearch.toLowerCase())
-    );
-  }, [results, debouncedSearch]);
-
-  // Handle load more with loading state
-  const handleLoadMore = async () => {
-    setIsLoadingMore(true);
-    try {
+    if (newPage > page && status === "CanLoadMore") {
       await loadMore();
-    } finally {
-      // Add a small delay to ensure smooth transition
-      setTimeout(() => {
-        setIsLoadingMore(false);
-      }, 500);
     }
+
+    setPage(newPage);
   };
 
-  const SkeletonGrid = ({ count }: { count: number }) => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {Array.from({ length: count }).map((_, index) => (
-        <SnippetSkeleton key={`skeleton-${index}`} />
-      ))}
-    </div>
-  );
+  const currentPageSnippets = useMemo(() => {
+    const startIndex = (page - 1) * 6;
+    const endIndex = startIndex + 6;
+    return snippets.slice(startIndex, endIndex);
+  }, [page, snippets]);
 
-  const SnippetGrid = () => (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-      {filteredResults.map((snippet) => (
-        <SnippetCard
-          key={snippet._id}
-          id={snippet._id}
-          projectFiles={snippet.projectFiles}
-          projectName={snippet.projectName}
-          userId={snippet.userId}
-          projectImage={snippet.projectImage}
-        />
-      ))}
-    </div>
-  );
+  const isFirstPage = status === "LoadingFirstPage";
+  const isLoadingMore = status === "LoadingMore";
+  const isLastPage = status === "Exhausted";
 
   return (
-    <main className="container mx-auto px-4 pt-8 pb-20">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold">Snippets</h1>
+    <main className="container flex flex-col gap-y-4 mx-auto px-4 py-8">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div className="flex flex-row justify-between items-center gap-2">
+          <h1 className="text-3xl font-bold text-black">Snippets</h1>
+        </div>
 
-        <div className="flex items-center gap-4">
-          <Input
-            type="text"
-            placeholder="Search snippets..."
-            className="max-w-sm"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+        <div className="flex flex-row gap-2">
+          <SearchComponent
+            value={searchText}
+            onChange={handleSearch}
+            className="w-8/12"
           />
-          <Button variant="outline" size="icon">
-            <FilterIcon className="h-4 w-4" />
-          </Button>
-          <Button asChild variant="outline" size="lg">
-            <Link href="/snippets/my-snippets">Your Snippets</Link>
-          </Button>
+          <FilterSnippets />
           <CreateSnippetForm />
+        </div>
+
+        <div>
+          {!isSearching && (
+            <PaginationComponent
+              currentPage={page}
+              isLastPage={isLastPage}
+              onPageChange={handlePageChange}
+              totalPages={totalPages}
+            />
+          )}
         </div>
       </div>
 
-      <div className="space-y-6">
-        {status === "LoadingFirstPage" ? (
-          <SkeletonGrid count={SKELETON_COUNT} />
+      <div className="py-2">
+        {isFirstPage || isLoadingMore ? (
+          <LoadingBlog />
+        ) : isSearching ? (
+          <SnippetsGrid items={searchResults} />
         ) : (
-          <>
-            <SnippetGrid />
-
-            {(status === "LoadingMore" || isLoadingMore) && (
-              <div className="mt-4 animate-fade-in">
-                <SkeletonGrid count={LOADING_MORE_COUNT} />
-              </div>
-            )}
-
-            {status === "CanLoadMore" && (
-              <div className="flex justify-center mt-8">
-                <Button
-                  onClick={handleLoadMore}
-                  size="lg"
-                  className="min-w-[200px]"
-                  disabled={isLoadingMore}
-                >
-                  {isLoadingMore ? (
-                    <div className="flex items-center gap-2">
-                      <Loader2 className="h-4 w-4 animate-spin" />
-                      <span>Loading...</span>
-                    </div>
-                  ) : (
-                    "Load More"
-                  )}
-                </Button>
-              </div>
-            )}
-
-            {status === "Exhausted" && filteredResults.length > 0 && (
-              <div className="text-center py-8 text-muted-foreground">
-                <p>You&apos;ve reached the end of the list</p>
-              </div>
-            )}
-          </>
+          <SnippetsGrid items={currentPageSnippets} />
         )}
       </div>
     </main>
   );
 };
 
-export default React.memo(SnippetsPage);
+export default SnippetsPage;

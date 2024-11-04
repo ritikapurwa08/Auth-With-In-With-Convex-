@@ -31,7 +31,6 @@ export const UseUpdateBlog = () => {
   const isSettled = useMemo(() => status === "settled", [status]);
 
   const mutation = useMutation(api.blog.update);
-  const blog = "hello";
   const mutate = useCallback(
     async (values: RequestType, options: Options) => {
       try {
